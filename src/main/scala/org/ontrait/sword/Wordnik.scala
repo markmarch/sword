@@ -33,7 +33,10 @@ trait ListQueryMethod extends Method[List[JValue]] {
 }
 
 trait Extractor[T] {
-  implicit val formats = DefaultFormats
+  // override default formats to parse wordnik date
+  implicit val formats = new DefaultFormats {
+    override def dateFormatter = new ThreadLocal(new java.text.SimpleDateFormat(wordnikDateFormat))()
+  }
 
   def get(json: JValue)(implicit manifest: Manifest[T]): Either[Throwable, T] = try {
     Right(json.extract[T])
