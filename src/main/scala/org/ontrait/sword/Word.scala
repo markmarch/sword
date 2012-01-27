@@ -11,13 +11,13 @@ object Examples {
   private[sword] class ExamplesBuilder(word: String, params: Map[String, String]) 
     extends ObjectQueryMethod {
 
-    private def param(key: String)(value: Any) = new ExamplesBuilder(word, params + (key -> value.toString))
+    private def param[T](key: String)(value: T) = new ExamplesBuilder(word, params + (key -> value.toString))
 
-    val includeDuplicate = param("includeDuplicate") _
-    val contentProvider = param("contentProvider") _
-    val useCanonical = param("useCanonical") _
-    val skip = param("skip") _
-    val limit = param("limit") _
+    val includeDuplicate = param[Boolean]("includeDuplicate") _
+    val contentProvider = param[String]("contentProvider") _
+    val useCanonical = param[Boolean]("useCanonical") _
+    val skip = param[Int]("skip") _
+    val limit = param[Int]("limit") _
 
     def complete = _ / "word.json" / word / "examples" <<? params
   }
@@ -29,12 +29,12 @@ object TopExample {
   def apply(word: String) = new TopExampleBuilder(word, Map())
 
   private[sword] class TopExampleBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod {
-    private def param(key: String)(value: Any) = new TopExampleBuilder(word, params + (key -> value.toString))
+    private def param[T](key: String)(value: T) = new TopExampleBuilder(word, params + (key -> value.toString))
 
-    val contentProvider = param("contentProvider") _
-    val useCanonical = param("useCanonical") _
+    val contentProvider = param[String]("contentProvider") _
+    val useCanonical = param[Boolean]("useCanonical") _
 
-    def complete = _ / "word.json" / "TopExample" <<? params
+    def complete = _ / "word.json" / word / "topExample" <<? params
   }
 }
 
@@ -56,20 +56,21 @@ object Example extends Extractor[Example] {
 
 case class Provider(name: String, id: Int)
 
-case class Example(provider: Provider, year: Int, url: String, word: String, text: String, title: String, exampleId: Long, rating: Double, documentId: Long)
+case class Example(provider: Provider, year: Int, url: String, word: String, text: String, 
+  title: String, exampleId: Long, rating: Double, documentId: Long)
 
 object Definitions {
   def apply(word: String) = new DefinitionsBuilder(word, Map())
 
   private[sword] class DefinitionsBuilder(word:String, params: Map[String, String]) extends ListQueryMethod {
-    private def param(key: String)(value: Any) = new DefinitionsBuilder(word, params + (key -> value.toString))
+    private def param[T](key: String)(value: T) = new DefinitionsBuilder(word, params + (key -> value.toString))
 
-    val limit = param("limit") _
-    val partOfSpeech = param("partOfSpeech") _
-    val includeRelated = param("includeRelated") _
-    val sourceDictionaries = param("sourceDictionaries") _
-    val useCanonical = param("useCanonical") _
-    val includeTag = param("includeTag") _
+    val limit = param[Int]("limit") _
+    val partOfSpeech = param[String]("partOfSpeech") _
+    val includeRelated = param[Boolean]("includeRelated") _
+    val sourceDictionaries = param[String]("sourceDictionaries") _
+    val useCanonical = param[Boolean]("useCanonical") _
+    val includeTag = param[String]("includeTag") _
 
     def complete = _ / "word.json" / word / "definitions" <<? params
   }
@@ -85,19 +86,20 @@ object Definition extends Extractor[Definition]{
   val sequence = 'sequence ? int
 }
 
-case class Definition(word: String, text: String, score: Double, partOfSpeech: String, attributionText: String, sourceDictionary: String, sequence: String)
+case class Definition(word: String, text: String, score: Double, partOfSpeech: String, 
+  attributionText: String, sourceDictionary: String, sequence: String)
 
 object Related extends Extractor[RelatedWords] {
   def apply(word: String) = new RelatedBuilder(word, Map())
 
   private[sword] class RelatedBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    def param(key: String)(value: Any) = new RelatedBuilder(word, params + (key -> value.toString))
+    def param[T](key: String)(value: T) = new RelatedBuilder(word, params + (key -> value.toString))
 
-    val useCanonical = param("useCanonical") _
-    val partOfSpeech = param("partOfSpeech") _
-    val sourceDictionary = param("sourceDictionary") _
-    val limit = param("limit") _
-    val `type` = param("type") _
+    val useCanonical = param[Boolean]("useCanonical") _
+    val partOfSpeech = param[String]("partOfSpeech") _
+    val sourceDictionary = param[String]("sourceDictionary") _
+    val limit = param[Int]("limit") _
+    val `type` = param[String]("type") _
 
     def complete = _ / "word.json" / word / "related" <<? params
   }
@@ -114,10 +116,10 @@ object Audios extends Extractor[Audio]{
   def apply(word: String) = new AudiosBuilder(word, Map())
 
   private[sword] class AudiosBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    private def param(key: String)(value: Any) = new AudiosBuilder(word, params + (key -> value.toString))
+    private def param[T](key: String)(value: T) = new AudiosBuilder(word, params + (key -> value.toString))
 
-    val useCanonical = param("useCanonical") _
-    val limit = param("limit") _
+    val useCanonical = param[Boolean]("useCanonical") _
+    val limit = param[Int]("limit") _
 
     def complete = _ / "word.json" / word / "audio"
   }
@@ -136,5 +138,7 @@ object Audio {
   val attributionUrl = 'attributionUrl ? str
 }
 
-case class Audio(id: Long, commentCount: Int, createdBy: String, createdAt: String, duration: Double, fileUrl: String, audioType: String, attributionText: String, attributionUrl: Option[String])
+case class Audio(id: Long, commentCount: Int, createdBy: String, createdAt: String,
+  duration: Double, fileUrl: String, audioType: String, attributionText: String, 
+  attributionUrl: Option[String])
 
