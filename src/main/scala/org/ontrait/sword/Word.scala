@@ -89,7 +89,7 @@ object Definition extends Extractor[Definition]{
 case class Definition(word: String, text: String, score: Double, partOfSpeech: String, 
   attributionText: String, sourceDictionary: String, sequence: String)
 
-object Related extends Extractor[RelatedWords] {
+object Related {
   def apply(word: String) = new RelatedBuilder(word, Map())
 
   private[sword] class RelatedBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
@@ -105,14 +105,14 @@ object Related extends Extractor[RelatedWords] {
   }
 }
 
-object RelatedWords {
+object RelatedWords extends Extractor[RelatedWords]{
   val words = 'words ? ary
   val relationshipType = 'relationshipType ? str
 }
 
 case class RelatedWords(words: List[String], relationshipType: String)
 
-object Audios extends Extractor[Audio]{
+object Audios {
   def apply(word: String) = new AudiosBuilder(word, Map())
 
   private[sword] class AudiosBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
@@ -125,7 +125,7 @@ object Audios extends Extractor[Audio]{
   }
 }
 
-object Audio {
+object Audio extends Extractor[Audio] {
   val commentCount = 'commentCount ? int
   val createdBy = 'createdBy ? str
   val createdAt = 'createdAt ? wdate
