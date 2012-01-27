@@ -24,8 +24,8 @@ trait Method[T] extends MethodBuilder {
   def defaultHandler: Request => Handler[T]
 }
 
-trait ObjectQueryMethod extends Method[List[JField]] {
-  def defaultHandler = _ ># ('result ? obj)
+trait ObjectQueryMethod extends Method[JValue] {
+  def defaultHandler = _ ># identity[JValue]
 }
 
 trait ListQueryMethod extends Method[List[JValue]] {
