@@ -28,6 +28,20 @@ trait ObjectQueryMethod extends Method[List[JField]] {
   def defaultHandler = _ ># ('result ? obj)
 }
 
+trait ListQueryMethod extends Method[List[JValue]] {
+  def defaultHandler = _ ># ary
+}
+
+trait Extractor[T] {
+  implicit val formats = DefaultFormats
+
+  def get(json: JValue)(implicit manifest: Manifest[T]): Either[Throwable, T] = try {
+    Right(json.extract[T])
+  } catch {
+    case e => Left(e)
+  }
+}
+
 case class ApiClient(apiKey: String) extends WordnikClient {
   def apply(block: Request => Request): Request = block(host) <<? Map("api_key" -> apiKey)
 }
