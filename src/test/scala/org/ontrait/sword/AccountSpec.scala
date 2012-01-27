@@ -3,10 +3,13 @@ package org.ontrait.sword
 import org.specs2.mutable._
 import dispatch._
 import liftjson.Js._
+import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 
 class AccountSpec extends Specification {
   import SwordUtils._
   val apiClient = ApiClient(loadProperty("wordnik.api.key", ""))
+  val http = new Http
   val props = getProps
 
   // Authentication test would invlaid the auth token stroed for other test
@@ -33,7 +36,6 @@ class AccountSpec extends Specification {
 
   "ApiTokenStatus" should {
     "check api token status" in {
-      val http = new Http
       val client = new WordnikClient{
         def apply(block: Request => Request): Request = block(host)
       }
@@ -50,7 +52,6 @@ class AccountSpec extends Specification {
 
   "User" should {
     "fetch user info" in {
-      val http = new Http
       val username = http(apiClient(User(loadProperty("wordnik.auth.token", ""))) ># ( User.username )).headOption
       username.get must be equalTo ("sword")
 
@@ -61,7 +62,7 @@ class AccountSpec extends Specification {
       }
     }
   }
-  
+
   "WordLists" should { 
     "extract WordList object from json" in {
       val json = parse("""
