@@ -44,4 +44,18 @@ class AccountSpec extends Specification {
       }
     }
   }
+
+  "User" should {
+    "fetch user info" in {
+      val http = new Http
+      val username = http(apiClient(User(loadProperty("wordnik.auth.token", ""))) ># ( User.username )).headOption
+      username.get must be equalTo ("sword")
+
+      {
+        http(apiClient(User("wrongtoken")) ># (ErrorResponse.message)) 
+      } must throwA[Exception].like {
+        case e => e.getMessage must contain ("User not logged in")
+      }
+    }
+  }
 }
