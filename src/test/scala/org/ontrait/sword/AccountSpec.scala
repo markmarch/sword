@@ -7,12 +7,14 @@ import liftjson.Js._
 class AccountSpec extends Specification {
   import SwordUtils._
   val apiClient = ApiClient(loadProperty("wordnik.api.key", ""))
+  val props = getProps
 
   "Authentication" should {
     "verify user crendentials" in {
       val http = new Http
-      val token = http(apiClient(Authentication("sword", "erhuaming")) ># (Authentication.token)).headOption
-      token.get.length must be > (0)
+      val token = http(apiClient(Authentication("sword", "erhuaming")) ># (Authentication.token)).head
+      token.length must be > (0)
+      props.setProperty("wordnik.auth.token", token)
 
       { 
         http(apiClient(Authentication("sword", "wrongpassword")) ># (Authentication.message))
@@ -45,17 +47,17 @@ class AccountSpec extends Specification {
     }
   }
 
-  "User" should {
-    "fetch user info" in {
-      val http = new Http
-      val username = http(apiClient(User(loadProperty("wordnik.auth.token", ""))) ># ( User.username )).headOption
-      username.get must be equalTo ("sword")
+  // "User" should {
+  //   "fetch user info" in {
+  //     val http = new Http
+  //     val username = http(apiClient(User(loadProperty("wordnik.auth.token", ""))) ># ( User.username )).headOption
+  //     username.get must be equalTo ("sword")
 
-      {
-        http(apiClient(User("wrongtoken")) ># (ErrorResponse.message)) 
-      } must throwA[Exception].like {
-        case e => e.getMessage must contain ("User not logged in")
-      }
-    }
-  }
+  //     {
+  //       http(apiClient(User("wrongtoken")) ># (ErrorResponse.message)) 
+  //     } must throwA[Exception].like {
+  //       case e => e.getMessage must contain ("User not logged in")
+  //     }
+  //   }
+  // }
 }
