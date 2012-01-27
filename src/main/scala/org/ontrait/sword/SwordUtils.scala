@@ -7,8 +7,7 @@ import java.io.{FileInputStream, File}
 object SwordUtils extends ConsoleLogger{
   implicit val defaultPropsFile = "default.properties"
 
-  def loadProperty(key: String , defaultValue: String)(implicit propsFile: String): String = {
-    println("util:" + new File(propsFile).getAbsolutePath)
+  def loadProperty(key: String , defaultValue: String = "")(implicit propsFile: String): String = {
     val props = new Properties
     try {
       props.load(new FileInputStream(propsFile))
