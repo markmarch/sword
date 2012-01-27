@@ -5,12 +5,23 @@ import dispatch._
 import dispatch.Request._
 import dispatch.liftjson.Js._
 import dispatch.liftjson._
+import net.liftweb.json._
 
 class WordSpec extends Specification {
   import SwordUtils._
 
   val apiClient = ApiClient(loadProperty("wordnik.api.key", ""))
   val http = new Http
+
+  "TopExample" should {
+    "get the top example for word 'fire'" in {
+      val res = http(apiClient.handle(TopExample("fire")))
+      Example.get(res) match {
+        case Right(example) => example.text must contain ("fire")
+        case Left(t) => log(t.getMessage); 1 must be > (1)
+      }
+    }  
+  }
 
   "Examples" should {
     "list all examples of 'fire'" in {
@@ -19,6 +30,22 @@ class WordSpec extends Specification {
       examples.flatMap(Example.text) forall {_.toLowerCase.contains("fire")} must beTrue 
 
       examples.map(json => Example.get(json).right.get) forall {_.text.toLowerCase.contains("fire")} must beTrue
+    }
+  }
+
+  "Example" should {
+    "extract Example object from json" in {
+      val json = parse("""
+        {"year":2006,"provider":{"name":"simonschuster","id":722},
+        "url":"http://books.simonandschuster.com/9781416540953","word":"fire",
+        "text":"Mohamed understood the word fire and said yes, it was fire.",
+        "title":"The Blog of War",
+        "exampleId":980553966,"rating":758.8301,"documentId":32479185}
+        """)
+      Example.get(json) match {
+        case Right(e) => e.exampleId must be equalTo (980553966L)
+        case Left(e) => log(e.getMessage); 1 must be > (1)
+      }
     }
   }
 
