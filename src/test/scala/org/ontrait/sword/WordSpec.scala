@@ -53,7 +53,8 @@ class WordSpec extends Specification {
     "list defintions of word 'contain'" in {
       val definitions = http(apiClient.handle(Definitions("contain")))
       definitions.size must be > (0)
-      definitions.map(json => Definition.get(json).right.get) forall {_.word == "contain"} must beTrue
+      definitions map { Definition.get } forall { _.isRight } must beTrue
+      definitions map { Definition.get } forall {_.right.get.word == "contain"}
     }
 
     "list at most 4 definitions for word 'contain'" in {
@@ -61,6 +62,91 @@ class WordSpec extends Specification {
       definitions.size must be > (0)
       definitions.size must be < (5)
       definitions.flatMap(Definition.word) forall { _ == "contain"} must beTrue
+    }
+  }
+
+  "Audios" should {
+    "extract Audio object from json(without attributionUrl)" in {
+      val json = parse("""
+        {
+          "commentCount": 0,
+          "createdBy": "ahd",
+          "createdAt": "2009-03-15T15:32:15.000+0000",
+          "id": 21250,
+          "word": "face",
+          "duration": 0.83,
+          "fileUrl": "http://api.wordnik.com/v4/audioFile.mp3/9ef4922bb296141bd4b50b4ce8e7e8857f3974446f5b80787b973f2cba2754d7",
+          "audioType": "pronunciation",
+          "attributionText": "from The American Heritage® Dictionary of the English Language, 4th Edition"
+        }"""
+      )
+      Audio.get(json) match {
+        case Right(audio) => audio.createdBy aka "creator of the audio" must be equalTo ("ahd")
+        case Left(e) =>  1 aka e.getMessage must be > (1)
+      }
+    }
+
+    "extract Audio object form json(with attributionUrl)" in {
+      val json = parse("""
+         {
+            "commentCount": 0,
+            "description": "see more at http://www.macmillandictionary.com/dictionary/american/face",
+            "createdBy": "macmillan",
+            "createdAt": "2011-04-10T06:32:38.795+0000",
+            "id": 217137,
+            "word": "face",
+            "duration": 1.04,
+            "fileUrl": "http://api.wordnik.com/v4/audioFile.mp3/2802d5867abe18bcfb65886bc46806fce1910bbb49f78dd9dad9a413b6f2afc8",
+            "audioType": "pronunciation",
+            "attributionText": "definition of face from Macmillan Dictionary -- free online dictionary and thesaurus",
+            "attributionUrl": "http://www.macmillandictionary.com/dictionary/american/face"
+        }"""
+      )
+      Audio.get(json) match {
+        case Right(audio) => audio.attributionUrl.get aka "attributionUrl of the audio" must endWith ("american/face")
+        case Left(e) => 1 aka e.getMessage must be > (1)
+      }
+    }
+
+    "fetch list of audios for word 'fire'" in {
+      val res = http(apiClient.handle(Audios("fire")))
+      res map { Audio.get } forall {_.isRight } must beTrue
+      res map { r => Audio.get(r).right.get } forall { _.word == "fire" } must beTrue 
+    }
+  }
+
+  "Realted" should {
+    "extract RelatedWords object form json" in {
+      val json = parse("""
+        {
+          "words": [
+            "blazing",
+            "clean out",
+            "smolder",
+            "shake",
+            "ignition",
+            "counterpreparation fire",
+            "pop",
+            "excite",
+            "cookfire",
+            "fratricide"
+          ],
+          "relationshipType": "hyponym"
+        }"""
+      )  
+      RelatedWords.get(json) match {
+        case Right(r) => 
+          r.words.size aka "number of related size" must be > (0)
+          r.words must contain ("cookfire")
+          r.relationshipType must be equalTo ("hyponym")
+        case Left(e) => 1 aka e.getMessage must be > (1)
+      }
+    }
+
+    "fetch related words of 'fire'" in {
+      val res = http(apiClient.handle(Related("fire")))
+      res.size aka "results size" must be > (0)
+      res map { RelatedWords.get } forall { _.isRight } must beTrue
     }
   }
 }
