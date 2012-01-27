@@ -5,6 +5,8 @@ import dispatch.Request._
 import dispatch.liftjson.Js._
 import net.liftweb.json._
 
+import java.util.Date
+
 object Examples {
   def apply(word: String) = new ExamplesBuilder(word, Map())
 
@@ -138,7 +140,6 @@ object Audio extends Extractor[Audio] {
   val attributionUrl = 'attributionUrl ? str
 }
 
-case class Audio(id: Long, commentCount: Int, createdBy: String, createdAt: String,
-  duration: Double, fileUrl: String, audioType: String, attributionText: String, 
-  attributionUrl: Option[String])
-
+case class Audio(id: Long, word: String, commentCount: Int, createdBy: String, 
+createdAt: Date, duration: Double, fileUrl: String, 
+audioType: String, attributionText: String,attributionUrl: Option[String])
