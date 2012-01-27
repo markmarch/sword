@@ -32,3 +32,14 @@ object ApiTokenStatus {
   val resetsInMillis = 'resetsInMillis ? int
 }
 
+object User {
+  def apply(authToken: String) = new ObjectQueryMethod {
+    def complete = _ / "account.json" / "user" <<? Map("auth_token" -> authToken)
+  }
+
+  val id = 'id ? int
+  val username = 'username ? str
+  val status = 'status ? int
+  val email = 'email ? str
+}
+
