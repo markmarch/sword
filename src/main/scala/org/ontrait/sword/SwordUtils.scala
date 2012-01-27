@@ -16,4 +16,14 @@ object SwordUtils extends ConsoleLogger{
     }
     props.getProperty(key, defaultValue)
   } 
+
+  def getProps(implicit propsFile: String): Properties = {
+    val props = new Properties
+    try {
+      props.load(new FileInputStream(propsFile))
+    } catch {
+      case e: Exception => log(e.getMessage)
+    }
+    props
+  }
 }
