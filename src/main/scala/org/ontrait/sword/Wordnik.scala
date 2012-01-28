@@ -24,6 +24,10 @@ trait Method[T] extends MethodBuilder {
   def defaultHandler: Request => Handler[T]
 }
 
+trait WithParams[M] {
+  protected def param[T](key: String)(value: T): M
+}
+
 trait ObjectQueryMethod extends Method[JValue] {
   def defaultHandler = _ ># identity[JValue]
 }
