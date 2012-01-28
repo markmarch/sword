@@ -1,0 +1,15 @@
+// with suggestions
+{
+  "id": 273356,
+  "canonicalForm": "faces",
+  "suggestions": [
+    "face"
+  ],
+  "word": "faces"
+}
+
+// without suggestions
+{
+  "id": 273356,
+  "word": "faces"
+}
