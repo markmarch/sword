@@ -7,6 +7,7 @@ import net.liftweb.json._
 
 import java.util.Date
 
+// examples
 object Examples {
   def apply(word: String) = new ExamplesBuilder(word, Map())
 
@@ -61,6 +62,28 @@ case class Provider(name: String, id: Int)
 case class Example(provider: Provider, year: Int, url: String, word: String, text: String, 
   title: String, exampleId: Long, rating: Double, documentId: Long)
 
+// word
+object Word extends Extractor[Word] {
+  def apply(word: String) = new WordBuilder(word, Map())
+  
+  private[sword] class WordBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod {
+    def param[T](key: String)(value: T) = new WordBuilder(word, params + (key -> value.toString))
+
+    val useCanonical = param[Boolean]("useCanonical") _
+    val includeSuggestions = param[Boolean]("includeSuggestions") _
+
+    def complete = _ / "word.json" / word <<? params
+  }
+
+  val word = 'word ? str
+  val suggestions = 'suggestions ? ary
+  val canonicalForm = 'canonicalForm ? str
+  val id = 'id ? int
+}
+
+case class Word(id: Long, word: String, suggestions: Option[List[String]], canonicalForm: Option[String])
+
+// definitions
 object Definitions {
   def apply(word: String) = new DefinitionsBuilder(word, Map())
 
@@ -91,6 +114,7 @@ object Definition extends Extractor[Definition]{
 case class Definition(word: String, text: String, score: Double, partOfSpeech: String, 
   attributionText: String, sourceDictionary: String, sequence: String)
 
+// related
 object Related {
   def apply(word: String) = new RelatedBuilder(word, Map())
 
@@ -114,6 +138,99 @@ object RelatedWords extends Extractor[RelatedWords]{
 
 case class RelatedWords(words: List[String], relationshipType: String)
 
+// pronunciations
+object Pronunciations {
+  def apply(word: String) = new PronunciationsBuilder(word, Map()) 
+  
+  private[sword] class PronunciationsBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
+    private def param[T](key: String)(value: T) = new PronunciationsBuilder(word, params + (key -> value.toString))
+
+    val useCanonical = param[Boolean]("useCanonical") _
+    val sourceDictionary = param[String]("sourceDictionary") _
+    val typeFormat = param[String]("typeFormat") _
+    val limit = param[Int]("limit") _
+
+    def complete = _ / "word.json" / word / "pronunciations" <<? params
+  } 
+}
+
+object Pronunciation extends Extractor[Pronunciation] {
+  val seq = 'seq ? int
+  val raw = 'raw ? str
+  val rawType = 'rawType ? str
+}
+
+case class Pronunciation(seq: Int, raw: String, rawType: String)
+
+// hyphenation
+object Hyphenation extends Extractor[Hyphenation] {
+  def apply(word: String) = new HyphenationBuilder(word, Map()) 
+
+  private[sword] class HyphenationBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
+    private def param[T](key: String)(value: T) = new HyphenationBuilder(word, params + (key -> value.toString))
+
+    val useCanonical = param[Boolean]("useCanonical") _
+    val sourceDictionary = param[String]("sourceDictionary") _
+    val limit = param[Int]("limit")_
+
+    def complete = _ / "word.json" / word / "hyphenation" <<? params
+  }
+
+  val `type` = 'type ? str
+  val seq = 'seq ? int
+  val text= 'text ? str
+}
+
+case class Hyphenation(`type`: Option[String], seq: Int, text: String)
+
+// frequency
+object Frequency extends Extractor[Frequency] {
+  def apply(word: String) = new FrequencyBuilder(word, Map())
+
+  private[sword] class FrequencyBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod {
+    private def param[T](key: String)(value: T) = new FrequencyBuilder(word, params + (key -> value.toString))
+
+    val useCanonical = param[Boolean]("useCanonical") _
+    val startYear = param[Int]("startYear") _
+    val endYear = param[Int]("endYear") _
+
+    def complete = _ / "word.json" / word / "frequency" <<? params
+  }
+
+  val word = 'word ? str
+  val totalCount = 'totalCount ? int
+  val frequency = 'frequency ? ary
+  val unknownYearCount = 'unknownYearCount ? int
+}
+
+case class YearCount(year: Int, count: Int)
+case class Frequency(word: String, totalCount: Int, frequency: List[YearCount], unknownYearCount: Int)
+
+// phrases
+object Phrases {
+  def apply(word: String) = new PhrasesBuilder(word, Map())
+  
+  private[sword] class PhrasesBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
+    private def param[T](key: String)(value: T) = new PhrasesBuilder(word, params + (key -> value.toString))
+
+    val limit = param[Int]("limit") _
+    val wlmi = param[Int]("wlmi") _
+    val useCanonical = param[Boolean]("useCanonical") _
+
+    def complete = _ / "word.json" / word/ "phrases" <<? params
+  }  
+}
+
+object Phrase extends Extractor[Phrase] {
+  val mi = 'mi ? double
+  val gram1 = 'gram1 ? str
+  val gram2 = 'gram2 ? str
+  val wlmi = 'wlmi ? double
+}
+
+case class Phrase(mi: Double, gram1: String, gram2: String, wlmi: Double)
+
+// audios
 object Audios {
   def apply(word: String) = new AudiosBuilder(word, Map())
 
