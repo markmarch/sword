@@ -1,0 +1,37 @@
+{
+  "id": 272321,
+  "word": "filibeg",
+  "examples": [
+    {
+      "url": "http://www.gutenberg.org/files/4300/old/ulyss10h.htm",
+      "text": "Mr Deasy stared sternly for some moments over the mantelpiece at the shapely bulk of a man in tartan filibegs: Albert Edward, prince of Wales.",
+      "title": "Ulysses, by James Joyce",
+      "id": 0
+    },
+    {
+      "url": "http://news.google.com/newspapers?id=eP0uAAAAIBAJ&sjid=v9sFAAAAIBAJ&dq=filibeg&pg=5732%2C4621976",
+      "text": "Although the kilt is no longer fashionable fighting garb in the British army, it is known that one Scottish unit sailing with the First Division of the Canadian Active Service Force wore the beloved filibeg.",
+      "title": "Lone Scottish Unit Wore Kilts Across, Ottawa Citizen, December 19, 1939",
+      "id": 0
+    },
+    {
+      "url": "http://query.nytimes.com/mem/archive/pdf?res=F60816FD3F55127A93C4A8178DD85F4D8285F9",
+      "text": "The bagpipe, ancient 'woodnote wild' of the Highlands, for centuries as Scottish as the filibeg, haggis, or the sporran, has been forbidden to play at the modern seaside resorts of Largs in Ayrshire.\r",
+      "title": "Scotch Resort Bars Bagpipe as Discouraging Patronage, The New York Times, June 16, 1929",
+      "id": 0
+    }
+  ],
+  "definitions": [
+    {
+      "text": "(noun) A plaited petticoat or skirt reaching only to the knees, worn by men in the Highlands of Scotland; a kilt.",
+      "partOfSpeech": "noun",
+      "source": "century"
+    }
+  ],
+  "contentProvider": {
+    "name": "wordnik",
+    "id": 711
+  },
+  "publishDate": "2012-01-27T03:00:00.000+0000",
+  "note": "'Filibeg' comes from the Gaelic 'feileadh beag,' with 'feileadh,' meaning 'fold' and 'beag,' meaning 'little.'"
+}
