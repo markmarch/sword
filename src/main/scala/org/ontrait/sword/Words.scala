@@ -8,7 +8,7 @@ import dispatch.liftjson.Js._
 import net.liftweb.json._
 import java.util.Date
 
-trait SearchCriteria[T] extends WithParams[T] {
+trait SearchCriteria[T] extends Params[T] {
   val caseSensitive = param[Boolean]("caseSensitive") _
   val includePartOfSpeech = param[String]("includePartOfSpeech") _
   val excludePartOfSpeech = param[String]("excludePartOfSpeech") _
@@ -95,7 +95,7 @@ case class ContentProvider(name: String, id: Long)
 case class WordOfTheDay(id: Long, word: String, examples: List[WOTAExample], definitions: List[WOTADefinition], contentProvider: ContentProvider, publishDate: Date, note: String)
 
 // random words
-trait RandomCriteria[T] extends WithParams[T] {
+trait RandomCriteria[T] extends Params[T] {
   val hasDictionaryDef = param[Boolean]("hasDictionaryDef") _
   val includePartOfSpeech = param[Boolean]("includePartOfSpeech") _
   val excludePartOfSpeech = param[Boolean]("excludePartOfSpeech") _
