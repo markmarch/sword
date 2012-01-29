@@ -8,7 +8,19 @@ import net.liftweb.json._
 
 import java.util.Date
 
+object Authenticate extends Extractor[Authenticate] {
+  def apply(username: String, password: String) = new AuthenticateBuilder(username, password)
 
+  private[sword] class AuthenticateBuilder(username: String, password: String, method: String = "GET") extends ObjectQueryMethod {
+
+    def complete = new Function1[Request, Request]{
+      def apply(r: Request) = method match {
+        case "GET" => r / "account.json" / "authenticate" / username <<? Map("password" -> password)
+        case _ => r / "account.json" / "authenticate" / username << password
+      }
+    } 
+
+    def POST = new AuthenticateBuilder(username, password, "POST")
   }
 
   val token = 'token ? str
@@ -16,20 +28,24 @@ import java.util.Date
   val userSignature = 'userSignature ? str  
 }
 
-object ApiTokenStatus {
+case class Authenticate(token: String, userId: Long, userSignature: String)
+
+object ApiTokenStatus extends Extractor[ApiTokenStatus]{
   def apply(apiKey: String) = new ObjectQueryMethod {
     def complete = _ / "account.json" / "apiTokenStatus" <<? Map("api_key" -> apiKey)
   }
 
   val valid = 'valid ? bool
   val token = 'token ? str
-  val expireDate = 'expiresInMillis ? date
+  val expiresInMillis = 'expiresInMillis ? date
   val remainingCalls = 'remainingCalls ? int
   val totalRequests = 'totalRequests ? int
   val resetsInMillis = 'resetsInMillis ? int
 }
 
-object User {
+case class ApiTokenStatus(valid: Boolean, token: String, expiresInMillis: Long, remainingCalls: Int, totalRequests: Int, resetsInMillis: Long)
+
+object User extends Extractor[User] {
   def apply(authToken: String) = new ObjectQueryMethod {
     def complete = _ / "account.json" / "user" <<? Map("auth_token" -> authToken)
   }
@@ -40,37 +56,6 @@ object User {
   val email = 'email ? str
 }
 
-// wordLists
-object WordLists {
-  def apply(authToken: String) = new WordListsBuilder(Map("auth_token" -> authToken))
-  
-  private[sword] class WordListsBuilder(params: Map[String, String]) extends ListQueryMethod {
-    private def param[T](key: String)(value: T) = new WordListsBuilder(params + (key -> value.toString))
-    val skip = param[Int]("skip") _
-    val limit = param[Int]("limit") _
-
-    def complete = _ / "account.json" / "wordLists" <<? params
-  }  
-}
-
-sealed abstract trait Type extends JString
-object Public extends JString("PUBLIC") with Type
-object Private extends JString("PRIVATE") with Type
-
-object WordList extends Extractor[WordList] {
-  val `type` = 'type ? in(Public, Private)
-  val userId = 'userId ? int
-  val username= 'username ? str
-  val permalink = 'permalink ? str
-  val numberWordsInList = 'numberWordsInList ? int
-  val lastActivityAt = 'lastActivityAt ? wdate
-  val updatedAt = 'updatedAt ? wdate
-  val createdAt = 'createdAt ? wdate
-  val description = 'description ? str
-  val name = 'name ? str
-  val id = 'id ? int
-}
-
-case class WordList(`type`: String, userId: Long, username: String, permalink: String, numberWordsInList: Int, lastActivityAt: Date, updatedAt: Date, createdAt: Date, description: String, name: String, id: Long)
+case class User(id: Long, username: String, status: Int, email: String)
 
 
