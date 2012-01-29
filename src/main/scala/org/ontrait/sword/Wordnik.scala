@@ -24,8 +24,35 @@ trait Method[T] extends MethodBuilder {
   def defaultHandler: Request => Handler[T]
 }
 
-trait WithParams[M] {
+trait Params[M] {
   protected def param[T](key: String)(value: T): M
+}
+
+trait AuthToken[M] extends Params[M] {
+  val authToken = param[String]("auth_token") _
+}
+
+sealed abstract class Order
+case object Desc extends Order {
+  override def toString = "desc"
+}
+case object Asc extends Order {
+  override def toString = "asc"
+}
+
+sealed abstract class SortBy
+
+case object Alpha extends SortBy {
+  override def toString = "aplha"
+}
+
+case object CreateDate extends SortBy {
+  override def toString = "createDate"
+}
+
+trait HasOrder[M] extends Params[M] {
+  val sortBy = param[SortBy]("sortBy") _
+  val sortOrder = param[Order]("sortOrder") _
 }
 
 trait ObjectQueryMethod extends Method[JValue] {
