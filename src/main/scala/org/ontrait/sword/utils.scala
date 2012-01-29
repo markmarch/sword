@@ -2,7 +2,7 @@ package org.ontrait.sword
 
 import scala.util.logging.ConsoleLogger 
 import java.util.Properties
-import java.io.{FileInputStream, File}
+import java.io.{FileInputStream, FileWriter, File}
 
 object SwordUtils extends ConsoleLogger{
   implicit val defaultPropsFile = "default.properties"
@@ -25,5 +25,15 @@ object SwordUtils extends ConsoleLogger{
       case e: Exception => log(e.getMessage)
     }
     props
+  }
+
+  def storeProps(props: Properties)(implicit propsFile: String) = {
+    val fs = new FileWriter(propsFile)
+    try {
+      props.store(fs, "")
+      fs.close
+    } catch {
+      case e => log(e.getMessage)
+    }
   }
 }
