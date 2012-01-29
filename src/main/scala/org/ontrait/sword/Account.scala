@@ -8,14 +8,9 @@ import net.liftweb.json._
 
 import java.util.Date
 
-object Authentication {
-  def apply(username: String, password: String) = new AuthenticationBuilder(username, password)
 
-  private[sword] class AuthenticationBuilder(username: String, password: String) extends ObjectQueryMethod {
-    def complete = _ / "account.json" / "authenticate"/ username <<? Map("password" -> password)
   }
 
-  val message = 'message ? str
   val token = 'token ? str
   val userId = 'userId ? int
   val userSignature = 'userSignature ? str  
