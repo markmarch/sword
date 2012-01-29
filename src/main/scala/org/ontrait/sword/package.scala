@@ -1,6 +1,8 @@
 package org.ontrait
 
 import dispatch.liftjson.Js._
+import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 
 package object sword {
   // date format for wordnik api
@@ -12,4 +14,6 @@ package object sword {
     override def initialValue = init
     def apply = get
   }
+
+  def toJsonStr(words: Iterable[String]): String = words.map("""{"word": "%s"}""".format(_)).mkString("[", ",", "]")
 }
