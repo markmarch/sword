@@ -9,12 +9,12 @@ import net.liftweb.json._
 import java.util.Date
 
 class WordListSpec extends Specification with TestClient {
-  val permalink = "third--1"
+  val permalink = "freedom--1"
 
-  "WordLists" should { 
+  "WordLists" should {
     "extract WordList object from json" in {
       val json = parse("""
-        { 
+        {
           "type":"PRIVATE",
           "userId":1082314,
           "username":"sword",
@@ -73,7 +73,7 @@ class WordListSpec extends Specification with TestClient {
       val name = util.Random.nextInt(10) + "name"
       val old = fetch(WordLists(authToken).ById(permalink))
       val list = WordList.get(old).right.get
-      fetch(WordLists(authToken).Update(permalink, list.copy(name=name)))
+      fetch(WordLists(authToken).Update(permalink, list.copy(name=name).toJsonStr))
 
       val res = fetch(WordLists(authToken).ById(permalink))
       WordList.get(res) must beRight.like {
