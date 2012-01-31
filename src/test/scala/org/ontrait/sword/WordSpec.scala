@@ -10,7 +10,7 @@ import net.liftweb.json._
 class WordSpec extends Specification with TestClient{
   "TopExample" should {
     "get the top example for word 'fire'" in {
-      val res = http(apiClient.handle(TopExample("fire")))
+      val res = fetch(TopExample("fire"))
       Example.get(res)  must beRight.like {
          case e: Example => e.text must contain ("fire")
       }
