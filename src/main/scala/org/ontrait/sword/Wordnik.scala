@@ -2,16 +2,16 @@ package org.ontrait.sword
 
 import dispatch._
 import dispatch.Request._
-import dispatch.oauth.OAuth._
 import dispatch.liftjson.Js._
 import net.liftweb.json._
+import SwordUtils._
 
 abstract class WordnikClient extends ((Request => Request) => Request) {
   val apiVersion = "v4"
   def hostname = "api.wordnik.com"
   def host: Request = :/ (hostname) / apiVersion
-  
-  def handle[T](method: Method[T]) = method.defaultHandler(apply(method)) 
+
+  def handle[T](method: Method[T]) = method.defaultHandler(apply(method))
 }
 
 trait MethodBuilder extends Builder[Request => Request] {
@@ -30,24 +30,6 @@ trait Params[M] {
 
 trait AuthToken[M] extends Params[M] {
   val authToken = param[String]("auth_token") _
-}
-
-sealed abstract class Order
-case object Desc extends Order {
-  override def toString = "desc"
-}
-case object Asc extends Order {
-  override def toString = "asc"
-}
-
-sealed abstract class SortBy
-
-case object Alpha extends SortBy {
-  override def toString = "aplha"
-}
-
-case object CreateDate extends SortBy {
-  override def toString = "createDate"
 }
 
 trait HasOrder[M] extends Params[M] {
@@ -84,3 +66,37 @@ object ErrorResponse {
   val message = 'message ? str
   val errorType = 'type ? str
 }
+
+sealed abstract class Order
+case object Desc extends Order {
+  override def toString = "desc"
+}
+case object Asc extends Order {
+  override def toString = "asc"
+}
+
+sealed abstract class SortBy
+
+case object Alpha extends SortBy {
+  override def toString = "aplha"
+}
+
+case object CreateDate extends SortBy {
+  override def toString = "createDate"
+}
+
+class WordnikAPI(val apiKey: String, val executor: Http) {
+  private val apiClient = ApiClient(apiKey)
+  private val client = new WordnikClient {
+    def apply(block: Request => Request): Request = block(host)
+  }
+
+  private[this] def fetch[T](m: Method[T]) = executor(apiClient.handle(m))
+
+  def get[T](method: Method[T]) = fetch(method)
+
+  def apiTokenStatus(api: String) = executor(client.handle(ApiTokenStatus(api)))
+
+}
+
+object Wordnik extends WordnikAPI(loadProperty("wordnik.api.key"), new Http)
