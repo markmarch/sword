@@ -18,14 +18,14 @@ object Authenticate extends Extractor[Authenticate] {
         case "GET" => r / "account.json" / "authenticate" / username <<? Map("password" -> password)
         case _ => r / "account.json" / "authenticate" / username << password
       }
-    } 
+    }
 
     def POST = new AuthenticateBuilder(username, password, "POST")
   }
 
   val token = 'token ? str
   val userId = 'userId ? int
-  val userSignature = 'userSignature ? str  
+  val userSignature = 'userSignature ? str
 }
 
 case class Authenticate(token: String, userId: Long, userSignature: String)
@@ -43,7 +43,14 @@ object ApiTokenStatus extends Extractor[ApiTokenStatus]{
   val resetsInMillis = 'resetsInMillis ? int
 }
 
-case class ApiTokenStatus(valid: Boolean, token: String, expiresInMillis: Long, remainingCalls: Int, totalRequests: Int, resetsInMillis: Long)
+case class ApiTokenStatus(
+  valid: Boolean,
+  token: String,
+  expiresInMillis: Long,
+  remainingCalls: Int,
+  totalRequests: Int,
+  resetsInMillis: Long
+)
 
 object User extends Extractor[User] {
   def apply(authToken: String) = new ObjectQueryMethod {

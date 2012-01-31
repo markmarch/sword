@@ -11,10 +11,11 @@ import java.util.Date
 object Examples {
   def apply(word: String) = new ExamplesBuilder(word, Map())
 
-  private[sword] class ExamplesBuilder(word: String, params: Map[String, String]) 
+  private[sword] class ExamplesBuilder(word: String, params: Map[String, String])
     extends ObjectQueryMethod {
 
-    private def param[T](key: String)(value: T) = new ExamplesBuilder(word, params + (key -> value.toString))
+    private def param[T](key: String)(value: T) =
+      new ExamplesBuilder(word, params + (key -> value.toString))
 
     val includeDuplicate = param[Boolean]("includeDuplicate") _
     val contentProvider = param[String]("contentProvider") _
@@ -31,8 +32,11 @@ object Examples {
 object TopExample {
   def apply(word: String) = new TopExampleBuilder(word, Map())
 
-  private[sword] class TopExampleBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod {
-    private def param[T](key: String)(value: T) = new TopExampleBuilder(word, params + (key -> value.toString))
+  private[sword] class TopExampleBuilder(word: String, params: Map[String, String])
+    extends ObjectQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new TopExampleBuilder(word, params + (key -> value.toString))
 
     val contentProvider = param[String]("contentProvider") _
     val useCanonical = param[Boolean]("useCanonical") _
@@ -44,7 +48,7 @@ object TopExample {
 object Example extends Extractor[Example] {
   object Provider extends Obj('provider) {
     val name = this >>~> 'name ? str
-    val id = this >>~> 'id ? int 
+    val id = this >>~> 'id ? int
   }
 
   val year = 'year ? int
@@ -59,36 +63,56 @@ object Example extends Extractor[Example] {
 
 case class Provider(name: String, id: Int)
 
-case class Example(provider: Provider, year: Int, url: String, word: String, text: String, 
-  title: String, exampleId: Long, rating: Double, documentId: Long)
+case class Example(
+  provider: Provider,
+  year: Int,
+  url: String,
+  word: String,
+  text: String,
+  title: String,
+  exampleId: Long,
+  rating: Double,
+  documentId: Long
+)
 
 // word
 object Word extends Extractor[Word] {
   def apply(word: String) = new WordBuilder(word, Map())
-  
-  private[sword] class WordBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod {
-    def param[T](key: String)(value: T) = new WordBuilder(word, params + (key -> value.toString))
+
+  private[sword] class WordBuilder(word: String, params: Map[String, String])
+    extends ObjectQueryMethod {
+
+    def param[T](key: String)(value: T) =
+    new WordBuilder(word, params + (key -> value.toString))
 
     val useCanonical = param[Boolean]("useCanonical") _
     val includeSuggestions = param[Boolean]("includeSuggestions") _
 
     def complete = _ / "word.json" / word <<? params
   }
-
   val word = 'word ? str
   val suggestions = 'suggestions ? ary
   val canonicalForm = 'canonicalForm ? str
   val id = 'id ? int
 }
 
-case class Word(id: Long, word: String, suggestions: Option[List[String]], canonicalForm: Option[String])
+case class Word(
+  id: Long,
+  word: String,
+  suggestions: Option[List[String]],
+  canonicalForm: Option[String],
+  originalWord: Option[String]
+)
 
 // definitions
 object Definitions {
   def apply(word: String) = new DefinitionsBuilder(word, Map())
 
-  private[sword] class DefinitionsBuilder(word:String, params: Map[String, String]) extends ListQueryMethod {
-    private def param[T](key: String)(value: T) = new DefinitionsBuilder(word, params + (key -> value.toString))
+  private[sword] class DefinitionsBuilder(word:String, params: Map[String, String])
+    extends ListQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new DefinitionsBuilder(word, params + (key -> value.toString))
 
     val limit = param[Int]("limit") _
     val partOfSpeech = param[String]("partOfSpeech") _
@@ -99,6 +123,7 @@ object Definitions {
 
     def complete = _ / "word.json" / word / "definitions" <<? params
   }
+
 }
 
 object Definition extends Extractor[Definition]{
@@ -111,15 +136,25 @@ object Definition extends Extractor[Definition]{
   val sequence = 'sequence ? int
 }
 
-case class Definition(word: String, text: String, score: Double, partOfSpeech: String, 
-  attributionText: String, sourceDictionary: String, sequence: String)
+case class Definition(
+  word: String,
+  text: String,
+  score: Double,
+  partOfSpeech: String,
+  attributionText: String,
+  sourceDictionary: String,
+  sequence: String
+)
 
 // related
 object Related {
   def apply(word: String) = new RelatedBuilder(word, Map())
 
-  private[sword] class RelatedBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    def param[T](key: String)(value: T) = new RelatedBuilder(word, params + (key -> value.toString))
+  private[sword] class RelatedBuilder(word: String, params: Map[String, String])
+    extends ListQueryMethod {
+
+    def param[T](key: String)(value: T) =
+      new RelatedBuilder(word, params + (key -> value.toString))
 
     val useCanonical = param[Boolean]("useCanonical") _
     val partOfSpeech = param[String]("partOfSpeech") _
@@ -129,6 +164,7 @@ object Related {
 
     def complete = _ / "word.json" / word / "related" <<? params
   }
+
 }
 
 object RelatedWords extends Extractor[RelatedWords]{
@@ -136,14 +172,20 @@ object RelatedWords extends Extractor[RelatedWords]{
   val relationshipType = 'relationshipType ? str
 }
 
-case class RelatedWords(words: List[String], relationshipType: String)
+case class RelatedWords(
+  words: List[String],
+  relationshipType: String
+)
 
 // pronunciations
 object Pronunciations {
-  def apply(word: String) = new PronunciationsBuilder(word, Map()) 
-  
-  private[sword] class PronunciationsBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    private def param[T](key: String)(value: T) = new PronunciationsBuilder(word, params + (key -> value.toString))
+  def apply(word: String) = new PronunciationsBuilder(word, Map())
+
+  private[sword] class PronunciationsBuilder(word: String, params: Map[String, String])
+    extends ListQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new PronunciationsBuilder(word, params + (key -> value.toString))
 
     val useCanonical = param[Boolean]("useCanonical") _
     val sourceDictionary = param[String]("sourceDictionary") _
@@ -151,7 +193,8 @@ object Pronunciations {
     val limit = param[Int]("limit") _
 
     def complete = _ / "word.json" / word / "pronunciations" <<? params
-  } 
+  }
+
 }
 
 object Pronunciation extends Extractor[Pronunciation] {
@@ -160,14 +203,23 @@ object Pronunciation extends Extractor[Pronunciation] {
   val rawType = 'rawType ? str
 }
 
-case class Pronunciation(seq: Int, raw: String, rawType: String)
+case class Pronunciation(
+  seq: Int,
+  raw: String,
+  rawType: String
+)
 
 // hyphenation
-object Hyphenation extends Extractor[Hyphenation] {
-  def apply(word: String) = new HyphenationBuilder(word, Map()) 
 
-  private[sword] class HyphenationBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    private def param[T](key: String)(value: T) = new HyphenationBuilder(word, params + (key -> value.toString))
+object Hyphenation extends Extractor[Hyphenation] {
+  def apply(word: String) = new HyphenationBuilder(word, Map())
+
+
+  private[sword] class HyphenationBuilder(word: String, params: Map[String, String])
+    extends ListQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new HyphenationBuilder(word, params + (key -> value.toString))
 
     val useCanonical = param[Boolean]("useCanonical") _
     val sourceDictionary = param[String]("sourceDictionary") _
@@ -181,14 +233,21 @@ object Hyphenation extends Extractor[Hyphenation] {
   val text= 'text ? str
 }
 
-case class Hyphenation(`type`: Option[String], seq: Int, text: String)
+case class Hyphenation(
+  `type`: Option[String],
+  seq: Int,
+  text: String
+)
 
 // frequency
 object Frequency extends Extractor[Frequency] {
   def apply(word: String) = new FrequencyBuilder(word, Map())
 
-  private[sword] class FrequencyBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod {
-    private def param[T](key: String)(value: T) = new FrequencyBuilder(word, params + (key -> value.toString))
+  private[sword] class FrequencyBuilder(word: String, params: Map[String, String])
+    extends ObjectQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new FrequencyBuilder(word, params + (key -> value.toString))
 
     val useCanonical = param[Boolean]("useCanonical") _
     val startYear = param[Int]("startYear") _
@@ -204,21 +263,31 @@ object Frequency extends Extractor[Frequency] {
 }
 
 case class YearCount(year: Int, count: Int)
-case class Frequency(word: String, totalCount: Int, frequency: List[YearCount], unknownYearCount: Int)
+case class Frequency(
+  word: String,
+  totalCount: Int,
+  frequency: List[YearCount],
+  unknownYearCount: Int
+)
 
 // phrases
+
 object Phrases {
   def apply(word: String) = new PhrasesBuilder(word, Map())
-  
-  private[sword] class PhrasesBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    private def param[T](key: String)(value: T) = new PhrasesBuilder(word, params + (key -> value.toString))
+
+  private[sword] class PhrasesBuilder(word: String, params: Map[String, String])
+    extends ListQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new PhrasesBuilder(word, params + (key -> value.toString))
 
     val limit = param[Int]("limit") _
     val wlmi = param[Int]("wlmi") _
     val useCanonical = param[Boolean]("useCanonical") _
 
     def complete = _ / "word.json" / word/ "phrases" <<? params
-  }  
+  }
+
 }
 
 object Phrase extends Extractor[Phrase] {
@@ -228,14 +297,22 @@ object Phrase extends Extractor[Phrase] {
   val wlmi = 'wlmi ? double
 }
 
-case class Phrase(mi: Double, gram1: String, gram2: String, wlmi: Double)
+case class Phrase(
+  mi: Double,
+  gram1: String,
+  gram2: String,
+  wlmi: Double
+)
 
 // audios
 object Audios {
   def apply(word: String) = new AudiosBuilder(word, Map())
 
-  private[sword] class AudiosBuilder(word: String, params: Map[String, String]) extends ListQueryMethod {
-    private def param[T](key: String)(value: T) = new AudiosBuilder(word, params + (key -> value.toString))
+  private[sword] class AudiosBuilder(word: String, params: Map[String, String])
+    extends ListQueryMethod {
+
+    private def param[T](key: String)(value: T) =
+      new AudiosBuilder(word, params + (key -> value.toString))
 
     val useCanonical = param[Boolean]("useCanonical") _
     val limit = param[Int]("limit") _
@@ -257,6 +334,15 @@ object Audio extends Extractor[Audio] {
   val attributionUrl = 'attributionUrl ? str
 }
 
-case class Audio(id: Long, word: String, commentCount: Int, createdBy: String, 
-createdAt: Date, duration: Double, fileUrl: String, 
-audioType: String, attributionText: String,attributionUrl: Option[String])
+case class Audio(
+  id: Long,
+  word: String,
+  commentCount: Int,
+  createdBy: String,
+  createdAt: Date,
+  duration: Double,
+  fileUrl: String,
+  audioType: String,
+  attributionText: String,
+  attributionUrl: Option[String]
+)

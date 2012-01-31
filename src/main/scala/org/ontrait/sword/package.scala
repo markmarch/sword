@@ -1,5 +1,7 @@
 package org.ontrait
 
+import dispatch._
+import dispatch.Request._
 import dispatch.liftjson.Js._
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._

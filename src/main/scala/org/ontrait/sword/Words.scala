@@ -19,18 +19,22 @@ trait SearchCriteria[T] extends Params[T] {
   val minLength = param[Int]("minLength") _
   val maxLength = param[Int]("maxLength") _
   val skip = param[Int]("skip") _
-  val limit = param[Int]("limit") _ 
+  val limit = param[Int]("limit") _
 }
 
 // search
 object Search {
   def apply(query: String) = new SearchBuilder(Map()).query(query)
 
-  private[sword] class SearchBuilder(params: Map[String, String]) extends ListQueryMethod with SearchCriteria[SearchBuilder] {
-    protected def param[T](key: String)(value: T) = new SearchBuilder(params + (key -> value.toString))
+  private[sword] class SearchBuilder(params: Map[String, String])
+    extends ListQueryMethod
+    with SearchCriteria[SearchBuilder] {
+
+    protected def param[T](key: String)(value: T) =
+      new SearchBuilder(params + (key -> value.toString))
 
     val query = param[String]("query") _
-    
+
     def complete = _ / "words.json" / "search" <<? params
   }
 }
@@ -46,8 +50,10 @@ case class SearchResult(count: Long, wordstring: String)
 object SearchNew {
   def apply(word: String) = new SearchBuilder(word, Map())
 
-  private[sword] class SearchBuilder(word: String, params: Map[String, String]) extends ObjectQueryMethod with SearchCriteria[SearchBuilder]{
-    protected def param[T](key: String)(value: T) = new SearchBuilder(word, params + (key -> value.toString))
+  private[sword] class SearchBuilder(word: String, params: Map[String, String])
+    extends ObjectQueryMethod with SearchCriteria[SearchBuilder]{
+    protected def param[T](key: String)(value: T) =
+      new SearchBuilder(word, params + (key -> value.toString))
 
     def complete = _ / "words.json" / "search" / word <<? params
   }
@@ -56,7 +62,9 @@ object SearchNew {
 object SearchResultNew extends Extractor[SearchResultNew] {
   val totalResults = 'totalResults ? int
   val searchResults = 'searchResults ? ary
+}
 
+object Result extends Extractor[Result] {
   val lexicality = 'lexicality ? double
   val count = 'count ? int
   val word = 'word ? str
@@ -69,8 +77,11 @@ case class SearchResultNew(totalResults: Int, searchResults: List[Result])
 object WordOfTheDay extends Extractor[WordOfTheDay] {
   def apply() = new WordOfTheDayBuilder(Map())
 
-  private[sword] class WordOfTheDayBuilder(params: Map[String, String]) extends ObjectQueryMethod {
-    def param[T](key: String)(value: T) = new WordOfTheDayBuilder(params + (key -> value.toString))
+  private[sword] class WordOfTheDayBuilder(params: Map[String, String])
+    extends ObjectQueryMethod {
+
+    def param[T](key: String)(value: T) =
+      new WordOfTheDayBuilder(params + (key -> value.toString))
 
     val date = param[String]("date") _
     val category = param[String]("category") _
@@ -92,7 +103,14 @@ case class WOTAExample(url: String, text: String, title: String, id: Int)
 case class WOTADefinition(text: String, partOfSpeech: String, source: String)
 case class ContentProvider(name: String, id: Long)
 
-case class WordOfTheDay(id: Long, word: String, examples: List[WOTAExample], definitions: List[WOTADefinition], contentProvider: ContentProvider, publishDate: Date, note: String)
+case class WordOfTheDay(
+  id: Long,
+  word: String,
+  examples: List[WOTAExample],
+  definitions: List[WOTADefinition],
+  contentProvider: ContentProvider,
+  publishDate: Date,
+  note: String)
 
 // random words
 trait RandomCriteria[T] extends Params[T] {
@@ -110,8 +128,12 @@ trait RandomCriteria[T] extends Params[T] {
 object RandomWord extends Extractor[RandomWord] {
   def apply() = new RandomWordBuilder(Map())
 
-  private[sword] class RandomWordBuilder(params: Map[String, String]) extends ObjectQueryMethod with RandomCriteria[RandomWordBuilder] {
-    protected def param[T](key: String)(value: T) = new RandomWordBuilder(params + (key -> value.toString))
+  private[sword] class RandomWordBuilder(params: Map[String, String])
+    extends ObjectQueryMethod
+    with RandomCriteria[RandomWordBuilder] {
+
+    protected def param[T](key: String)(value: T) =
+      new RandomWordBuilder(params + (key -> value.toString))
 
     def complete = _ / "words.json" / "randomWord" <<? params
   }
@@ -125,11 +147,14 @@ case class RandomWord(id: Long, word: String)
 object RandomWords {
   def apply() = new RandomWordsBuilder(Map())
 
-  private[sword] class RandomWordsBuilder(params: Map[String, String]) extends ListQueryMethod with RandomCriteria[RandomWordsBuilder] {
-    protected def param[T](key: String)(value: T) = new RandomWordsBuilder(params + (key -> value.toString))
+  private[sword] class RandomWordsBuilder(params: Map[String, String])
+    extends ListQueryMethod
+    with RandomCriteria[RandomWordsBuilder]
+    with HasOrder[RandomWordsBuilder]{
 
-    val sortBy = param[String]("sortBy") _
-    val sortOrder = param[String]("sortOrder") _
+    protected def param[T](key: String)(value: T) =
+      new RandomWordsBuilder(params + (key -> value.toString))
+
     val limit = param[Int]("limit") _
 
     def complete = _ / "words.json" / "randomWords" <<? params

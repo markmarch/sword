@@ -15,7 +15,7 @@ case class WordLists(authToken: String) {
   // get word list by user auth token
   object ByUser {
     def apply() = new ByUserBuilder(Map()).authToken(authToken)
-    
+
     private[sword] class ByUserBuilder(params: Map[String, String]) extends ListQueryMethod with AuthToken[ByUserBuilder]{
       protected def param[T](key: String)(value: T) = new ByUserBuilder(params + (key -> value.toString))
       val skip = param[Int]("skip") _
@@ -23,7 +23,7 @@ case class WordLists(authToken: String) {
 
       def complete = _ / "account.json" / "wordLists" <<? params
     }
-  }  
+  }
 
   object ById {
     def apply(listId: String) = new ObjectQueryMethod {
@@ -45,28 +45,28 @@ case class WordLists(authToken: String) {
   }
 
   object Add {
-    def apply(listId: String, words: Iterable[String]) = new ListQueryMethod {
+    def apply(listId: String, words: Iterable[String]) = new ObjectQueryMethod {
       def complete = _ / "wordList.json" / listId / "words" << (toJsonStr(words), contentType) <<? Map("auth_token" -> authToken)
     }
   }
 
   object DeleteWords {
-    def apply(listId: String, words: Iterable[String]) = new ListQueryMethod {
+    def apply(listId: String, words: Iterable[String]) = new ObjectQueryMethod {
       def complete = _ / "wordList.json" / listId / "deleteWords" << (toJsonStr(words), contentType) <<? Map("auth_token" -> authToken)
     }
   }
 
   object Delete {
     def apply(listId: String) = new ObjectQueryMethod {
-      def complete = _.DELETE / "wordList.json" / listId <<? Map("auth_token" -> authToken) 
+      def complete = _.DELETE / "wordList.json" / listId <<? Map("auth_token" -> authToken)
     }
   }
 
   object Update {
-    def apply(listId: String, list: WordList) = new ObjectQueryMethod {
+    def apply(listId: String, list: String) = new ObjectQueryMethod {
       def complete = new Function1[Request, Request] {
         def apply(r: Request) = {
-          r.PUT.copy(body = Some(new RefStringEntity(list.toJsonStr, contentType, r.defaultCharset))) / "wordList.json" / listId <<? Map("auth_token" -> authToken) 
+          r.PUT.copy(body = Some(new RefStringEntity(list, contentType, r.defaultCharset))) / "wordList.json" / listId <<? Map("auth_token" -> authToken)
         }
       }
     }
@@ -84,7 +84,15 @@ object WordListItem extends Extractor[WordListItem] {
   val word = 'word ? str
 }
 
-case class WordListItem(userId: Long, username: String, numberCommentsOnWord: Int, numberLists: Int, createdAt: Date, id: Long, word: String)
+case class WordListItem(
+  userId: Long,
+  username: String,
+  numberCommentsOnWord: Int,
+  numberLists: Int,
+  createdAt: Date,
+  id: Long,
+  word: String
+)
 
 sealed abstract trait Type extends JString
 object Public extends JString("PUBLIC") with Type
@@ -104,8 +112,19 @@ object WordList extends Extractor[WordList] {
   val id = 'id ? int
 }
 
-case class WordList(`type`: String, userId: Long, username: String, permalink: String, numberWordsInList: Int, lastActivityAt: Date, updatedAt: Date, createdAt: Date, description: String, name: String, id: Long) {
-  import net.liftweb.json._
+case class WordList(
+  `type`: String,
+  userId: Long,
+  username: String,
+  permalink: String,
+  numberWordsInList: Int,
+  lastActivityAt: Date,
+  updatedAt: Date,
+  createdAt: Date,
+  description: String,
+  name: String,
+  id: Long
+) {
   import Serialization._
   implicit val formats = Serialization.formats(ShortTypeHints(List(classOf[WordList])))
   def toJsonStr = write(this)
