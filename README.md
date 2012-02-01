@@ -36,12 +36,14 @@ A sample app:
 
 ```scala
 import org.ontrait.sword._
+import dispatch._
+
 object HelloWordnik extends App {
   
   // get the definitions for a word
   val res = Wordnik.get(Definitions("fire").limit(5)) // will fetch get json response
   val definitions = res flatMap { Definition.text } // extract definitions 
-  definitions foreach (println)
+  definitions foreach println
   
   // to use different Executor(see http://dispatch.databinder.net/Dispatch.html to learn more about Executor)
   val apiKey = "put you api key here"
@@ -49,8 +51,8 @@ object HelloWordnik extends App {
   
   // get the top example for a word
   val example = Example.get(api.get(TopExample("fire")) match {
-    case Right(e) => e.text
-    case Left(e) => throw e
+    case Right(e) => println(e.text)
+    case Left(e) => print(e.getMessage)
   }
   
 }
