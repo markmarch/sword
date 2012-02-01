@@ -4,6 +4,8 @@ import dispatch._
 import dispatch.Request._
 import dispatch.liftjson.Js._
 import net.liftweb.json._
+import java.text.SimpleDateFormat
+
 import SwordUtils._
 
 abstract class WordnikClient extends ((Request => Request) => Request) {
@@ -48,7 +50,8 @@ trait ListQueryMethod extends Method[List[JValue]] {
 trait Extractor[T] {
   // override default formats to parse wordnik date
   implicit val formats = new DefaultFormats {
-    override def dateFormatter = new ThreadLocal(new java.text.SimpleDateFormat(wordnikDateFormat))()
+    override def dateFormatter =
+      new ThreadLocal(new SimpleDateFormat(wordnikDateFormat))()
   }
 
   def get(json: JValue)(implicit manifest: Manifest[T]): Either[Throwable, T] = try {

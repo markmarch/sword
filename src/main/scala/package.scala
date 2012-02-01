@@ -12,10 +12,12 @@ package object sword {
   val wdate = datestr(wordnikDateFormat)
 
   // taken form lift json library
-  class ThreadLocal[A](init: => A) extends java.lang.ThreadLocal[A] with (() => A) {
+  class ThreadLocal[A](init: => A) extends java.lang.ThreadLocal[A]
+    with (() => A) {
     override def initialValue = init
     def apply = get
   }
 
-  def toJsonStr(words: Iterable[String]): String = words.map("""{"word": "%s"}""".format(_)).mkString("[", ",", "]")
+  def toJsonStr(words: Iterable[String]): String =
+    words.map("""{"word": "%s"}""".format(_)).mkString("[", ",", "]")
 }

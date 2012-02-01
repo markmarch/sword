@@ -9,13 +9,16 @@ import net.liftweb.json._
 import java.util.Date
 
 object Authenticate extends Extractor[Authenticate] {
-  def apply(username: String, password: String) = new AuthenticateBuilder(username, password)
+  def apply(username: String, password: String) =
+    new AuthenticateBuilder(username, password)
 
-  private[sword] class AuthenticateBuilder(username: String, password: String, method: String = "GET") extends ObjectQueryMethod {
+  private[sword] class AuthenticateBuilder(username: String, password: String,
+    method: String = "GET") extends ObjectQueryMethod {
 
     def complete = new Function1[Request, Request]{
       def apply(r: Request) = method match {
-        case "GET" => r / "account.json" / "authenticate" / username <<? Map("password" -> password)
+        case "GET" => r / "account.json" / "authenticate" / username <<?
+          Map("password" -> password)
         case _ => r / "account.json" / "authenticate" / username << password
       }
     }
@@ -32,7 +35,8 @@ case class Authenticate(token: String, userId: Long, userSignature: String)
 
 object ApiTokenStatus extends Extractor[ApiTokenStatus]{
   def apply(apiKey: String) = new ObjectQueryMethod {
-    def complete = _ / "account.json" / "apiTokenStatus" <<? Map("api_key" -> apiKey)
+    def complete = _ / "account.json" / "apiTokenStatus" <<?
+      Map("api_key" -> apiKey)
   }
 
   val valid = 'valid ? bool
@@ -54,7 +58,8 @@ case class ApiTokenStatus(
 
 object User extends Extractor[User] {
   def apply(authToken: String) = new ObjectQueryMethod {
-    def complete = _ / "account.json" / "user" <<? Map("auth_token" -> authToken)
+    def complete = _ / "account.json" / "user" <<?
+      Map("auth_token" -> authToken)
   }
 
   val id = 'id ? int

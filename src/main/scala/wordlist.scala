@@ -16,8 +16,11 @@ case class WordLists(authToken: String) {
   object ByUser {
     def apply() = new ByUserBuilder(Map()).authToken(authToken)
 
-    private[sword] class ByUserBuilder(params: Map[String, String]) extends ListQueryMethod with AuthToken[ByUserBuilder]{
-      protected def param[T](key: String)(value: T) = new ByUserBuilder(params + (key -> value.toString))
+    private[sword] class ByUserBuilder(params: Map[String, String])
+      extends ListQueryMethod with AuthToken[ByUserBuilder]{
+
+      protected def param[T](key: String)(value: T) =
+        new ByUserBuilder(params + (key -> value.toString))
       val skip = param[Int]("skip") _
       val limit = param[Int]("limit") _
 
@@ -27,15 +30,21 @@ case class WordLists(authToken: String) {
 
   object ById {
     def apply(listId: String) = new ObjectQueryMethod {
-      def complete = _ / "wordList.json" / listId <<? Map("auth_token" -> authToken)
+      def complete = _ / "wordList.json" / listId <<?
+        Map("auth_token" -> authToken)
     }
   }
 
   object Words {
     def apply(listId: String) = new WordsBuilder(listId, Map()).authToken(authToken)
 
-    private[sword] class WordsBuilder(listId: String, params: Map[String, String]) extends ListQueryMethod with AuthToken[WordsBuilder] with HasOrder[WordsBuilder] {
-      protected def param[T](key: String)(value: T) = new WordsBuilder(listId, params + (key -> value.toString))
+    private[sword] class WordsBuilder(listId: String, params: Map[String, String])
+      extends ListQueryMethod
+      with AuthToken[WordsBuilder]
+      with HasOrder[WordsBuilder] {
+
+      protected def param[T](key: String)(value: T) =
+        new WordsBuilder(listId, params + (key -> value.toString))
 
       val skip = param[Int]("skip") _
       val limit = param[Int]("limit") _
@@ -46,19 +55,22 @@ case class WordLists(authToken: String) {
 
   object Add {
     def apply(listId: String, words: Iterable[String]) = new ObjectQueryMethod {
-      def complete = _ / "wordList.json" / listId / "words" << (toJsonStr(words), contentType) <<? Map("auth_token" -> authToken)
+      def complete = _ / "wordList.json" / listId / "words" <<
+        (toJsonStr(words), contentType) <<? Map("auth_token" -> authToken)
     }
   }
 
   object DeleteWords {
     def apply(listId: String, words: Iterable[String]) = new ObjectQueryMethod {
-      def complete = _ / "wordList.json" / listId / "deleteWords" << (toJsonStr(words), contentType) <<? Map("auth_token" -> authToken)
+      def complete = _ / "wordList.json" / listId / "deleteWords" <<
+        (toJsonStr(words), contentType) <<? Map("auth_token" -> authToken)
     }
   }
 
   object Delete {
     def apply(listId: String) = new ObjectQueryMethod {
-      def complete = _.DELETE / "wordList.json" / listId <<? Map("auth_token" -> authToken)
+      def complete = _.DELETE / "wordList.json" / listId <<?
+        Map("auth_token" -> authToken)
     }
   }
 
@@ -66,7 +78,8 @@ case class WordLists(authToken: String) {
     def apply(listId: String, list: String) = new ObjectQueryMethod {
       def complete = new Function1[Request, Request] {
         def apply(r: Request) = {
-          r.PUT.copy(body = Some(new RefStringEntity(list, contentType, r.defaultCharset))) / "wordList.json" / listId <<? Map("auth_token" -> authToken)
+          r.PUT.copy(body = Some(new RefStringEntity(list, contentType, r.defaultCharset))) /
+             "wordList.json" / listId <<? Map("auth_token" -> authToken)
         }
       }
     }
